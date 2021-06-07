@@ -1,102 +1,70 @@
-import React, { Component } from 'react';
+import React from 'react';
 import axios from 'axios';
-import FooterHome from '../components/FooterHome'
-import '../styles/contact.css'
 
+class App extends React.Component {
 
-export default class contact extends Component {
-  constructor (props){
-    super(props)
-    this.onChangeName = this.onChangeName.bind(this);
-    this.onChangeEmail = this.onChangeEmail.bind(this);
-    this.onChangeQuestion = this.onChangeQuestion.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+  constructor(props) {
+    super(props);
     this.state = {
-        name: " ",
-        email: " ",
-        comment: " ",
-      }
+      name: '',
+      email: '',
+      message: ''
     }
-
   }
 
- console.log(contact)
-    axios.post(BACKEND_URL + 'contact/add', contact)
-    .then(res=>console.log(res.data));
-    
-    this.props.history.push('/');
-    
-    this.setState({
-        name: '',
-        email: '',
-        comment: ''
-    }); 
+  handleSubmit(e){
+    e.preventDefault();
+    axios({
+      method: "POST",
+      url:"http://localhost:3002/send",
+      data:  this.state
+    }).then((response)=>{
+      if (response.data.status === 'success') {
+        alert("Message Sent.");
+        this.resetForm()
+      } else if (response.data.status === 'fail') {
+        alert("Message failed to send.")
+      }
+    })
+  }
 
-    onChangeName(e) 
-      this.setState({name: e.target.value});
-  
+  resetForm(){
+    this.setState({name: '', email: '', message: ''})
+  }
 
-  onChangeEmail(e) 
-      this.setState({email: e.target.value});
-  
-
-  onChangeSubject(e) 
-      this.setState({subject: e.target.value});
-  
-
-  onSubmit(e) 
-      this.setState({message: e.target.value});
-
-
-
-  
-
-  render() 
-    return (
-      <div className="section">
-      <div className="container">
-        <div className="row">
-        <div className="col-md-12">
-          <div className="section-title">
-          <h2 className="title">Contact Us</h2>
-                            
-          <form id="contact-form" onSubmit={this.submitEmail.bind(this)} 
-            method="POST">
-            <div className="form-group">
-            <div className="row">
-            <div className="col-md-6">
-              <input placeholder = "Name"  id="name" type="text" 
-              className="form-control" required value={this.state.name} 
-                onChange={this.onNameChange.bind(this)}/>
-                    </div>
-              <div className="col-md-6">
-                <input placeholder = "Email"  id="email" type="email"
-                className="form-control" aria-describedby="emailHelp"
-                required value={this.state.email} onChange=
-                  {this.onEmailChange.bind(this)}/>
-                    </div>
-                    </div>
-                    </div>
-                    <div className="form-group">
-                  <input placeholder = "Subject"  id="subject" type="text"
-                className="form-control" required value={this.state.subject}
-              onChange={this.onSubjectChange.bind(this)}/>
-              </div>
-              <div className="form-group">
-              <textarea placeholder = "Message"  id="message" 
-              className="form-control" rows="1" 
-              required value={this.state.message}
-              onChange= {this.onMsgChange.bind(this)}/>
-              </div>
-              <button type="submit" className="primary-btn submit">Submit</button>
-              </form>
-              </div>
-              </div>
-
+  render() {
+    return(
+      <div className="App">
+        <form id="contact-form" onSubmit={this.handleSubmit.bind(this)} method="POST">
+          <div className="form-group">
+              <label htmlFor="name">Name</label>
+              <input type="text" className="form-control" id="name" value={this.state.name} onChange={this.onNameChange.bind(this)} />
           </div>
-
-        </div>
-        </div>
+          <div className="form-group">
+              <label htmlFor="exampleInputEmail1">Email address</label>
+              <input type="email" className="form-control" id="email" aria-describedby="emailHelp" value={this.state.email} onChange={this.onEmailChange.bind(this)} />
+          </div>
+          <div className="form-group">
+              <label htmlFor="message">Message</label>
+              <textarea className="form-control" rows="5" id="message" value={this.state.message} onChange={this.onMessageChange.bind(this)} />
+          </div>
+          <button type="submit" className="btn btn-primary">Submit</button>
+        </form>
+      </div>
     );
+  }
 
+  onNameChange(event) {
+	  this.setState({name: event.target.value})
+  }
 
+  onEmailChange(event) {
+	  this.setState({email: event.target.value})
+  }
+
+  onMessageChange(event) {
+	  this.setState({message: event.target.value})
+  }
+}
+
+export default App;
